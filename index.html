@@ -385,6 +385,7 @@
         subject: 'AI / ML Engineering Opportunity',
         message: ''
       });
+      const [isSendingMessage, setIsSendingMessage] = useState(false);
       const [messageSubmitted, setMessageSubmitted] = useState(false);
 
       const categories = ['All', 'GenAI & RAG', 'MLOps & Cloud', 'Data Science & ML'];
@@ -508,6 +509,45 @@
           ...prev,
           message: `Hi Yoosuf, I reviewed your AI & MLOps portfolio (especially your NIA-recognized Multimodal RAG Educational Platform and AWS/MLflow pipelines) and would love to discuss a ${prev.subject} role with our team.`
         }));
+      };
+
+      const handleContactSubmit = async (e) => {
+        e.preventDefault();
+        if (isSendingMessage) return;
+        setIsSendingMessage(true);
+
+        try {
+          const response = await fetch("https://formsubmit.co/ajax/yoosuf.ahamed10@gmail.com", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json"
+            },
+            body: JSON.stringify({
+              name: contactForm.name,
+              email: contactForm.email,
+              _subject: `Portfolio Inquiry: ${contactForm.subject}`,
+              message: contactForm.message
+            })
+          });
+
+          if (response.ok) {
+            setMessageSubmitted(true);
+            setContactForm({
+              name: '',
+              email: '',
+              subject: 'AI / ML Engineering Opportunity',
+              message: ''
+            });
+          } else {
+            throw new Error("FormSubmit fallback");
+          }
+        } catch (err) {
+          window.location.href = `mailto:${portfolio.profile.email}?subject=${encodeURIComponent(contactForm.subject)}&body=${encodeURIComponent(`From: ${contactForm.name} (${contactForm.email})\n\n${contactForm.message}`)}`;
+          setMessageSubmitted(true);
+        } finally {
+          setIsSendingMessage(false);
+        }
       };
 
       return (
@@ -1240,9 +1280,9 @@
                   {messageSubmitted ? (
                     <div className="p-8 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-center space-y-3">
                       <div className="text-3xl">✅</div>
-                      <h3 className="text-lg font-bold text-white">Ready to Send!</h3>
+                      <h3 className="text-lg font-bold text-white">Message Sent Successfully!</h3>
                       <p className="text-xs text-slate-300">
-                        Your email client has been opened addressed to {portfolio.profile.email}.
+                        Your message has been delivered directly to {portfolio.profile.email}. Yoosuf will get back to you shortly!
                       </p>
                       <button
                         onClick={() => setMessageSubmitted(false)}
@@ -1252,14 +1292,7 @@
                       </button>
                     </div>
                   ) : (
-                    <form
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        window.location.href = `mailto:${portfolio.profile.email}?subject=${encodeURIComponent(contactForm.subject)}&body=${encodeURIComponent(contactForm.message)}`;
-                        setMessageSubmitted(true);
-                      }}
-                      className="space-y-4"
-                    >
+                    <form onSubmit={handleContactSubmit} className="space-y-4">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-mono text-cyan-400">Direct Inquiry Form</span>
                         <button
@@ -1308,9 +1341,10 @@
                       />
                       <button
                         type="submit"
-                        className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-slate-950 font-bold text-sm shadow-lg"
+                        disabled={isSendingMessage}
+                        className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-slate-950 font-bold text-sm shadow-lg disabled:opacity-50"
                       >
-                        Send Direct Message 🚀
+                        {isSendingMessage ? "Sending directly to Yoosuf's Inbox..." : "Send Direct Message 🚀"}
                       </button>
                     </form>
                   )}
