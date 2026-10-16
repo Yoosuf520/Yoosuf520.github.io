@@ -396,20 +396,11 @@ export default function App() {
   const [isCertModalOpen, setIsCertModalOpen] = useState(false);
   const [isLinkedinGuideOpen, setIsLinkedinGuideOpen] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
-
-  const [contactForm, setContactForm] = useState({
-    name: '',
-    email: '',
-    subject: 'AI / ML Engineering Opportunity',
-    message: ''
-  });
+  const [contactForm, setContactForm] = useState({ name: '', email: '', subject: 'AI / ML Engineering Opportunity', message: '' });
   const [messageSubmitted, setMessageSubmitted] = useState(false);
-
+  
   const [chatMessages, setChatMessages] = useState([
-    {
-      role: 'assistant',
-      text: "Hi! I'm Yoosuf's AI Portfolio Agent. Ask me anything about his Multimodal Hybrid RAG startup, Kubernetes Agentic RAG, AWS MLOps pipelines, or ProYouth 2026 recognition!"
-    }
+    { role: 'assistant', text: "Hi! I'm Yoosuf's AI Portfolio Agent. Ask me anything about his Multimodal Hybrid RAG startup, Kubernetes Agentic RAG, AWS MLOps pipelines, or ProYouth 2026 recognition!" }
   ]);
   const [chatInput, setChatInput] = useState('');
   const [isChatLoading, setIsChatLoading] = useState(false);
@@ -421,36 +412,12 @@ export default function App() {
   const [projectAiQuestion, setProjectAiQuestion] = useState('');
   const [projectAiAnswer, setProjectAiAnswer] = useState('');
   const [isProjectAiLoading, setIsProjectAiLoading] = useState(false);
-
   const [isDraftingMessage, setIsDraftingMessage] = useState(false);
-  const [newProject, setNewProject] = useState({
-    title: '',
-    category: 'GenAI & RAG',
-    status: 'Production Ready',
-    metrics: '',
-    summary: '',
-    problem: '',
-    tech: '',
-    architecture: '',
-    githubUrl: 'https://github.com/Yoosuf520'
-  });
 
   const categories = ['All', 'GenAI & RAG', 'MLOps & Cloud', 'Data Science & ML'];
 
   const buildPortfolioSystemContext = () => {
-    return `You are the official AI Portfolio Copilot for ${portfolio.profile.name} (${portfolio.profile.legalName}), ${portfolio.profile.title}.
-Location: ${portfolio.profile.location}
-Education: ${portfolio.profile.education}; ${portfolio.profile.secondaryEducation}
-Contact: Email ${portfolio.profile.email}, Phone ${portfolio.profile.phone}, GitHub ${portfolio.profile.github}, LinkedIn ${portfolio.profile.linkedin}
-Executive Summary: ${portfolio.profile.tagline}
-
-Projects (${portfolio.projects.length} total):
-${portfolio.projects
-  .map((p, idx) => `${idx + 1}. ${p.title} (${p.category} | ${p.status})\n   Tech Stack: ${p.tech.join(', ')}\n   Summary: ${p.summary}`)
-  .join('\n\n')}
-
-Highlights:
-${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.description}`).join('\n')}`;
+    return `You are the official AI Portfolio Copilot for ${portfolio.profile.name} (${portfolio.profile.legalName}), ${portfolio.profile.title}. Location: ${portfolio.profile.location} Education: ${portfolio.profile.education}; ${portfolio.profile.secondaryEducation} Contact: Email ${portfolio.profile.email}, Phone ${portfolio.profile.phone}, GitHub ${portfolio.profile.github}, LinkedIn ${portfolio.profile.linkedin} Executive Summary: ${portfolio.profile.tagline} Projects (${portfolio.projects.length} total): ${portfolio.projects.map((p, idx) => `${idx + 1}. ${p.title} (${p.category} | ${p.status})\n Tech Stack: ${p.tech.join(', ')}\n Summary: ${p.summary}`).join('\n\n')} Highlights: ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.description}`).join('\n')}`;
   };
 
   const getSmartFallbackAnalysis = (queryText) => {
@@ -495,7 +462,6 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
     const targetJD = (presetText !== undefined ? presetText : jobDescriptionInput).trim();
     if (!targetJD || isRoleMatchLoading) return;
     if (presetText !== undefined) setJobDescriptionInput(presetText);
-
     setIsRoleMatchLoading(true);
 
     try {
@@ -511,12 +477,8 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
             ]
           }
         ],
-        systemInstruction: {
-          parts: [{ text: buildPortfolioSystemContext() }]
-        },
-        generationConfig: {
-          responseMimeType: 'application/json'
-        }
+        systemInstruction: { parts: [{ text: buildPortfolioSystemContext() }] },
+        generationConfig: { responseMimeType: 'application/json' }
       };
 
       const response = await fetch(apiUrl, {
@@ -524,16 +486,13 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-
       if (!response.ok) throw new Error(`API error ${response.status}`);
       const result = await response.json();
       const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!text) throw new Error('Empty response');
-
       const parsed = JSON.parse(text);
       setRoleMatchResult(parsed);
     } catch (err) {
-      // Robust instant fallback to ensure zero downtime
       const fallback = getSmartFallbackAnalysis(targetJD);
       setRoleMatchResult(fallback);
     } finally {
@@ -544,7 +503,6 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
   const handleSendCopilotQuery = async (customQuery) => {
     const queryText = (customQuery !== undefined ? customQuery : chatInput).trim();
     if (!queryText || isChatLoading) return;
-
     const updatedMessages = [...chatMessages, { role: 'user', text: queryText }];
     setChatMessages(updatedMessages);
     if (customQuery === undefined) setChatInput('');
@@ -558,9 +516,7 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: queryText }] }],
-          systemInstruction: {
-            parts: [{ text: buildPortfolioSystemContext() + '\nKeep answers clear, professional, and under 130 words.' }]
-          }
+          systemInstruction: { parts: [{ text: buildPortfolioSystemContext() + '\nKeep answers clear, professional, and under 130 words.' }] }
         })
       });
       const data = await response.json();
@@ -580,7 +536,6 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
     const question = (promptText || projectAiQuestion).trim();
     if (!question || isProjectAiLoading) return;
     if (promptText) setProjectAiQuestion(promptText);
-
     setIsProjectAiLoading(true);
     setProjectAiAnswer('');
 
@@ -591,11 +546,7 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: `Project: ${project.title}\nTech: ${project.tech.join(', ')}\nProblem: ${project.problem}\nArchitecture: ${project.architecture.join(' ')}\n\nVisitor Question: ${question}\n\nProvide a concise, expert technical answer.`
-            }]
-          }],
+          contents: [{ parts: [{ text: `Project: ${project.title}\nTech: ${project.tech.join(', ')}\nProblem: ${project.problem}\nArchitecture: ${project.architecture.join(' ')}\n\nVisitor Question: ${question}\n\nProvide a concise, expert technical answer.` }] }],
           systemInstruction: { parts: [{ text: buildPortfolioSystemContext() }] }
         })
       });
@@ -612,7 +563,6 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
   const handleDraftContactMessage = async () => {
     if (isDraftingMessage) return;
     setIsDraftingMessage(true);
-
     try {
       const apiKey = "";
       const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
@@ -665,149 +615,6 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
     }
   };
 
-  const handleDownloadStandaloneHTML = () => {
-    const serializedData = JSON.stringify(portfolio).replace(/</g, '\\u003c');
-    const htmlContent = `<!DOCTYPE html>
-<html lang="en" class="dark scroll-smooth">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${portfolio.profile.name} | AI, Data Science & MLOps Portfolio</title>
-  <script src="https://cdn.tailwindcss.com"><\/script>
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"><\/script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"><\/script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"><\/script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
-    body { font-family: 'Inter', sans-serif; background-color: #070B14; color: #F1F5F9; }
-  </style>
-</head>
-<body class="bg-[#070B14] text-slate-100 antialiased selection:bg-cyan-500/30 selection:text-cyan-200">
-  <div id="root"></div>
-  <script type="text/babel">
-    const { useState } = React;
-    const INITIAL_PORTFOLIO = ${serializedData};
-    function HostedApp() {
-      const [portfolio] = useState(INITIAL_PORTFOLIO);
-      const [selectedProject, setSelectedProject] = useState(null);
-      const [isCertModalOpen, setIsCertModalOpen] = useState(false);
-      const [copiedEmail, setCopiedEmail] = useState(false);
-      const handleCopyEmail = () => {
-        navigator.clipboard.writeText(portfolio.profile.email);
-        setCopiedEmail(true);
-        setTimeout(() => setCopiedEmail(false), 2000);
-      };
-      return (
-        <div className="min-h-screen bg-[#070B14] text-slate-100 font-sans p-4 sm:p-8 max-w-7xl mx-auto space-y-16">
-          <header className="flex items-center justify-between border-b border-slate-800 pb-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400 font-mono font-bold">YA</div>
-              <div>
-                <h1 className="font-bold text-white text-lg">${portfolio.profile.name}</h1>
-                <p className="text-xs font-mono text-cyan-400">AI • Data Science • MLOps</p>
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <button onClick={() => setIsCertModalOpen(true)} className="px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-semibold">
-                ProYouth Certificate
-              </button>
-              <a href={portfolio.profile.github} target="_blank" className="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-200 text-xs font-semibold">GitHub</a>
-            </div>
-          </header>
-          <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            <div className="lg:col-span-7 space-y-6">
-              <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-300 text-xs font-mono border border-emerald-500/30">
-                {portfolio.profile.status}
-              </span>
-              <h2 className="text-4xl sm:text-5xl font-extrabold text-white leading-tight">
-                Architecting Grounded <span className="text-cyan-400">Generative AI, RAG</span> & Cloud MLOps.
-              </h2>
-              <p className="text-slate-300 text-base leading-relaxed">{portfolio.profile.tagline}</p>
-              <div className="flex flex-wrap gap-3">
-                <button onClick={handleCopyEmail} className="px-4 py-2.5 rounded-xl bg-cyan-500 text-slate-950 font-bold text-sm">
-                  {copiedEmail ? 'Copied Email!' : portfolio.profile.email}
-                </button>
-                <a href={portfolio.profile.linkedin} target="_blank" className="px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm">
-                  LinkedIn Profile
-                </a>
-              </div>
-            </div>
-            <div className="lg:col-span-5 bg-slate-900/80 border border-slate-800 rounded-2xl p-6 text-center space-y-4 shadow-2xl">
-              <div className="w-36 h-36 rounded-full mx-auto bg-gradient-to-tr from-amber-500 to-cyan-500 p-1 flex items-center justify-center">
-                <div className="w-full h-full rounded-full bg-slate-950 flex flex-col items-center justify-center text-amber-300 font-bold text-2xl">
-                  YA
-                </div>
-              </div>
-              <h3 className="text-xl font-bold text-white">${portfolio.profile.name}</h3>
-              <p className="text-xs text-cyan-400 font-mono">{portfolio.profile.education}</p>
-            </div>
-          </section>
-          <section className="space-y-6">
-            <h3 className="text-2xl font-bold text-white border-b border-slate-800 pb-3">Featured Projects (7)</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {portfolio.projects.map((p) => (
-                <div key={p.id} className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between space-y-4">
-                  <div className="space-y-2">
-                    <span className="text-[11px] font-mono text-cyan-300 bg-cyan-500/10 px-2.5 py-0.5 rounded">{p.category}</span>
-                    <h4 className="text-lg font-bold text-white">{p.title}</h4>
-                    <p className="text-sm text-slate-300">{p.summary}</p>
-                    <div className="flex flex-wrap gap-1.5 pt-2">
-                      {p.tech.map((t, idx) => (
-                        <span key={idx} className="px-2 py-0.5 rounded bg-slate-950 text-[11px] font-mono text-slate-300 border border-slate-800">{t}</span>
-                      ))}
-                    </div>
-                  </div>
-                  <button onClick={() => setSelectedProject(p)} className="text-xs font-semibold text-cyan-400 text-left pt-2">
-                    View Architecture Details →
-                  </button>
-                </div>
-              ))}
-            </div>
-          </section>
-          {selectedProject && (
-            <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-              <div className="bg-[#0B1220] border border-slate-700 rounded-2xl max-w-xl w-full p-6 space-y-4">
-                <div className="flex justify-between items-start">
-                  <h4 className="text-xl font-bold text-white">{selectedProject.title}</h4>
-                  <button onClick={() => setSelectedProject(null)} className="text-slate-400 hover:text-white font-mono text-sm">✕</button>
-                </div>
-                <p className="text-sm text-slate-300">{selectedProject.problem}</p>
-              </div>
-            </div>
-          )}
-          {isCertModalOpen && (
-            <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
-              <div className="bg-white text-slate-900 rounded-2xl max-w-2xl w-full p-8 space-y-4 relative">
-                <button onClick={() => setIsCertModalOpen(false)} className="absolute top-4 right-4 text-slate-500 font-bold">✕</button>
-                <div className="font-black text-sm tracking-widest text-slate-800">NATIONAL INNOVATION AGENCY SRI LANKA</div>
-                <div className="text-center space-y-2 py-4">
-                  <p className="text-xs text-slate-600">This is to certify that</p>
-                  <p className="text-2xl font-black underline">M.A YOOSUF AHAMED</p>
-                  <p className="text-xs text-slate-600">has successfully completed the</p>
-                  <p className="text-xl font-extrabold">Artificial Intelligence Boot Camp</p>
-                  <p className="text-xs font-semibold text-slate-700">9–10 September 2026 (#Proyouth 2026 Competition)</p>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      );
-    }
-    ReactDOM.createRoot(document.getElementById('root')).render(<HostedApp />);
-  <\/script>
-</body>
-</html>`;
-    const blob = new Blob([htmlContent], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'index.html';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  };
-
   const handleAvatarUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -834,78 +641,37 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
     reader.readAsDataURL(file);
   };
 
-  const handleAddProject = (e) => {
-    e.preventDefault();
-    if (!newProject.title.trim()) return;
-
-    const created = {
-      id: `proj-${Date.now()}`,
-      title: newProject.title,
-      category: newProject.category,
-      featured: true,
-      status: newProject.status || 'Active Project',
-      metrics: newProject.metrics || 'End-to-End Architecture',
-      summary: newProject.summary,
-      problem: newProject.problem || 'Designed for scalable real-world deployment.',
-      architecture: newProject.architecture
-        ? newProject.architecture.split('\n').filter((line) => line.trim() !== '')
-        : ['Modular Python architecture with automated testing and deployment.'],
-      tech: newProject.tech
-        ? newProject.tech.split(',').map((t) => t.trim()).filter(Boolean)
-        : ['Python', 'FastAPI', 'Docker'],
-      githubUrl: newProject.githubUrl || 'https://github.com/Yoosuf520'
-    };
-
-    setPortfolio((prev) => ({
-      ...prev,
-      projects: [created, ...prev.projects]
-    }));
-
-    setNewProject({
-      title: '',
-      category: 'GenAI & RAG',
-      status: 'Production Ready',
-      metrics: '',
-      summary: '',
-      problem: '',
-      tech: '',
-      architecture: '',
-      githubUrl: 'https://github.com/Yoosuf520'
-    });
-    setIsEditModalOpen(false);
-  };
-
-  const handleExportJSON = () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(portfolio, null, 2));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", "yoosuf_ahamed_portfolio.json");
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-  };
-
-  const handleSendContactMessage = (e) => {
-    e.preventDefault();
-    if (!contactForm.name.trim() || !contactForm.message.trim()) return;
-    setMessageSubmitted(true);
-
-    const mailtoLink = `mailto:${portfolio.profile.email}?subject=${encodeURIComponent(
-      `${contactForm.subject} — from ${contactForm.name}`
-    )}&body=${encodeURIComponent(
-      `Name: ${contactForm.name}\nEmail: ${contactForm.email}\n\nMessage:\n${contactForm.message}`
-    )}`;
-    window.open(mailtoLink, '_blank');
-
-    setTimeout(() => {
-      setMessageSubmitted(false);
-      setContactForm({
-        name: '',
-        email: '',
-        subject: 'AI / ML Engineering Opportunity',
-        message: ''
-      });
-    }, 4000);
+  const handleDownloadStandaloneHTML = () => {
+    const htmlContent = `<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${portfolio.profile.name} | AI Portfolio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#070B14] text-slate-100 p-8 max-w-4xl mx-auto space-y-6">
+  <h1 class="text-4xl font-extrabold text-white">${portfolio.profile.name}</h1>
+  <p class="text-cyan-400 font-mono">${portfolio.profile.title}</p>
+  <p class="text-slate-300">${portfolio.profile.tagline}</p>
+  <div class="p-4 rounded-xl bg-slate-900 border border-slate-800">
+    <h3 class="font-bold text-amber-400">ProYouth 2026 AI Boot Camp Certified</h3>
+    <p class="text-sm text-slate-300">National Innovation Agency (NIA) & NPS Sri Lanka</p>
+  </div>
+  <div class="space-y-4">
+    <h2 class="text-2xl font-bold">Projects (${portfolio.projects.length})</h2>
+    ${portfolio.projects.map(p => `<div class="p-4 bg-slate-900 rounded-xl border border-slate-800"><h4 class="font-bold text-cyan-300">${p.title}</h4><p class="text-xs text-slate-400">${p.metrics}</p><p class="text-sm text-slate-300 mt-2">${p.summary}</p></div>`).join('')}
+  </div>
+</body>
+</html>`;
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'index.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   return (
@@ -919,63 +685,48 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
       <header className="sticky top-0 z-40 backdrop-blur-xl bg-[#070B14]/85 border-b border-slate-800/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-indigo-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400 font-mono font-bold shadow-lg shadow-cyan-500/10">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-indigo-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400 font-mono font-bold shadow-lg">
               YA
             </div>
             <div>
-              <span className="font-bold tracking-tight text-white block leading-none">
-                {portfolio.profile.name}
-              </span>
-              <span className="text-[11px] font-mono text-cyan-400 tracking-wider uppercase">
-                AI • Data Science • MLOps
-              </span>
+              <span className="font-bold tracking-tight text-white block leading-none">{portfolio.profile.name}</span>
+              <span className="text-[11px] font-mono text-cyan-400 tracking-wider uppercase">AI • Data Science • MLOps</span>
             </div>
           </div>
 
           <nav className="hidden md:flex items-center gap-6 text-sm text-slate-300">
-            <a href="#ai-hub" className="hover:text-cyan-400 transition-colors flex items-center gap-1.5 text-cyan-300 font-medium">
-              <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-              AI Copilot & Matcher
-            </a>
             <a href="#projects" className="hover:text-cyan-400 transition-colors">Projects (7)</a>
             <a href="#architecture" className="hover:text-cyan-400 transition-colors">RAG & MLOps Arch</a>
-            <a href="#skills" className="hover:text-cyan-400 transition-colors">Technical Skills</a>
-            <a href="#highlights" className="hover:text-cyan-400 transition-colors flex items-center gap-1.5">
+            <a href="#skills" className="hover:text-cyan-400 transition-colors">Skills</a>
+            <a href="#highlights" className="hover:text-cyan-400 transition-colors flex items-center gap-1.5 text-amber-300 font-medium">
               <Award className="w-3.5 h-3.5 text-amber-400" />
               ProYouth & Highlights
             </a>
+            <a href="#copilot" className="hover:text-cyan-400 transition-colors text-cyan-300 font-medium">✨ AI Copilot</a>
             <a href="#references" className="hover:text-cyan-400 transition-colors">References</a>
-            <a href="#contact" className="hover:text-cyan-400 transition-colors font-semibold text-cyan-400">Contact</a>
           </nav>
 
           <div className="flex items-center gap-2.5">
             <button
-              onClick={() => setIsLinkedinGuideOpen(true)}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 transition-all"
-            >
-              <Linkedin className="w-3.5 h-3.5" />
-              Link to LinkedIn
-            </button>
-            <button
               onClick={() => setIsCertModalOpen(true)}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 transition-all"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 transition-all"
             >
               <FileBadge className="w-3.5 h-3.5" />
               ProYouth Certificate
             </button>
             <button
-              onClick={() => setIsEditModalOpen(true)}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-slate-800/90 hover:bg-slate-700 text-cyan-300 border border-cyan-500/30 transition-all shadow-sm"
+              onClick={() => setIsLinkedinGuideOpen(true)}
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 transition-all shadow-sm"
             >
-              <Edit3 className="w-3.5 h-3.5" />
-              <span>Customize / Photos</span>
+              <Linkedin className="w-3.5 h-3.5" />
+              <span>Link to LinkedIn</span>
             </button>
           </div>
         </div>
       </header>
 
       <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-24 space-y-24">
-        {/* HERO SECTION */}
+        {/* Hero */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center pt-2">
           <div className="lg:col-span-7 space-y-6">
             <div className="inline-flex flex-wrap items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-mono">
@@ -1030,7 +781,7 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
                 className="inline-flex items-center gap-2 px-4 py-3 rounded-xl font-medium text-sm bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 transition-all"
               >
                 <Github className="w-4 h-4 text-cyan-400" />
-                <span>GitHub</span>
+                <span>github.com/Yoosuf520</span>
               </a>
 
               <a
@@ -1050,7 +801,7 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
                 {copiedEmail ? (
                   <>
                     <Check className="w-4 h-4 text-emerald-400" />
-                    <span className="text-emerald-300">Copied Email!</span>
+                    <span className="text-emerald-300">Copied {portfolio.profile.email}!</span>
                   </>
                 ) : (
                   <>
@@ -1064,6 +815,8 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
 
           <div className="lg:col-span-5">
             <div className="relative rounded-2xl bg-[#0B1220] border border-slate-800/90 p-6 shadow-2xl overflow-hidden">
+              <div className="absolute -top-20 -right-20 w-52 h-52 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+              
               <div className="flex flex-col items-center text-center space-y-4">
                 <div className="relative group">
                   <div className="w-44 h-44 sm:w-48 sm:h-48 rounded-full p-1.5 bg-gradient-to-tr from-amber-500/60 via-cyan-500/60 to-indigo-500/60 shadow-2xl">
@@ -1074,7 +827,7 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
                         className="w-full h-full object-cover rounded-full bg-slate-950"
                       />
                     ) : (
-                      <div className="w-full h-full rounded-full bg-gradient-to-b from-slate-800 to-slate-950 flex flex-col items-center justify-center p-4 text-center">
+                      <div className="w-full h-full rounded-full bg-gradient-to-b from-slate-800 to-slate-950 flex flex-col items-center justify-center p-4 text-center relative overflow-hidden">
                         <div className="w-16 h-16 rounded-full bg-amber-500/15 border border-amber-400/30 flex items-center justify-center text-amber-300 font-bold text-2xl mb-1">
                           YA
                         </div>
@@ -1086,14 +839,19 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
 
                   <label className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900/95 hover:bg-slate-800 text-cyan-300 border border-cyan-500/40 text-xs font-medium cursor-pointer shadow-lg transition-all">
                     <Camera className="w-3.5 h-3.5" />
-                    <span>{portfolio.profile.avatarUrl ? "Change Photo" : "Load Suit Photo"}</span>
+                    <span>{portfolio.profile.avatarUrl ? "Change Profile Photo" : "Load Suit Photo"}</span>
                     <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
                   </label>
                 </div>
 
                 <div className="space-y-1">
                   <h2 className="text-xl font-bold text-white">{portfolio.profile.name}</h2>
-                  <p className="text-xs font-mono text-cyan-400">B.Sc. (Hons) CS (AI Specialization)</p>
+                  <p className="text-xs font-mono text-cyan-400">
+                    B.Sc. (Hons) CS (AI Specialization) • Final Year
+                  </p>
+                  <p className="text-xs text-slate-400">
+                    Lincoln University College, Sri Lanka (2023–2026)
+                  </p>
                 </div>
 
                 <div className="w-full pt-2 space-y-2.5 text-left">
@@ -1101,16 +859,32 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
                     <div className="flex items-start gap-2.5">
                       <Award className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
                       <div>
-                        <div className="text-xs font-bold text-amber-200">#Proyouth 2026 AI Boot Camp Certified</div>
-                        <div className="text-[11px] text-slate-300">NIA & NPS Sri Lanka • 9–10 Sept 2026</div>
+                        <div className="text-xs font-bold text-amber-200">
+                          #Proyouth 2026 AI Boot Camp Certified
+                        </div>
+                        <div className="text-[11px] text-slate-300">
+                          National Innovation Agency (NIA) & NPS Sri Lanka • 9–10 Sept 2026
+                        </div>
                       </div>
                     </div>
                     <button
                       onClick={() => setIsCertModalOpen(true)}
                       className="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 text-[11px] font-semibold shrink-0 border border-amber-400/30"
                     >
-                      View
+                      View Cert
                     </button>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-start gap-2.5">
+                    <Sparkles className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5" />
+                    <div>
+                      <div className="text-xs font-bold text-cyan-200">
+                        Founder — Award-Recognized AI Education Startup
+                      </div>
+                      <div className="text-[11px] text-slate-300">
+                        BGE-M3 + Qdrant + BM25 + CLIP Multimodal RAG for Sri Lankan Students
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1118,187 +892,123 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
           </div>
         </section>
 
-        {/* METRICS STRIP */}
+        {/* Metrics Strip */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {portfolio.metrics.map((m, idx) => (
-            <div key={idx} className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/90">
+            <div key={idx} className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/95 hover:border-slate-700 transition-all flex flex-col justify-between">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono uppercase tracking-wider text-slate-400">{m.label}</span>
                 <span className="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-                  <Layers className="w-4 h-4" />
+                  {m.icon === 'Layers' && <Layers className="w-4 h-4" />}
+                  {m.icon === 'Cpu' && <Cpu className="w-4 h-4" />}
+                  {m.icon === 'Award' && <Award className="w-4 h-4" />}
+                  {m.icon === 'Cloud' && <Cloud className="w-4 h-4" />}
                 </span>
               </div>
-              <div className="my-3 text-2xl sm:text-3xl font-extrabold text-white tracking-tight">{m.value}</div>
+              <div className="my-3">
+                <div className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">{m.value}</div>
+              </div>
               <div className="text-xs text-slate-400">{m.sub}</div>
             </div>
           ))}
         </section>
 
-        {/* AI HUB SECTION */}
-        <section id="ai-hub" className="rounded-3xl bg-gradient-to-br from-slate-900/90 via-slate-900/70 to-indigo-950/40 border border-cyan-500/30 p-6 sm:p-10 space-y-8 shadow-2xl scroll-mt-20">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/15 text-cyan-300 text-xs font-mono border border-cyan-500/30 mb-3">
-              <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-spin" />
-              <span>Gemini 3 Flash AI Powered Hub</span>
+        {/* AI Recruiter Job-Fit Matcher */}
+        <section className="rounded-2xl bg-gradient-to-br from-indigo-950/40 via-slate-900/90 to-cyan-950/30 border border-cyan-500/30 p-6 sm:p-8 space-y-6 shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 translate-x-12 -translate-y-12 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-mono mb-2">
+                <Wand2 className="w-3.5 h-3.5 text-cyan-400" />
+                <span>AI Recruiter Matcher (Powered by Gemini)</span>
+              </div>
+              <h2 className="text-2xl font-bold text-white">Evaluate Yoosuf's Fit for Your Role</h2>
+              <p className="text-sm text-slate-300">Select a preset role or paste your job description to instantly generate an AI match score, matching skills, and project evidence.</p>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-white">Interactive AI Portfolio Copilot & Role Matcher</h2>
-            <p className="text-sm text-slate-300 mt-2">
-              Recruiters and hiring managers can chat live with an AI agent trained on Yoosuf's CV or instantly evaluate how well Yoosuf fits any job description.
-            </p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => handleAnalyzeRoleFit("We are hiring a Senior GenAI & RAG Engineer experienced in vector databases (Qdrant), embedding models (BGE-M3), hybrid retrieval, LangChain, and evaluation guardrails.")}
+                className="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-200 border border-cyan-500/40 text-xs font-semibold"
+              >
+                🎯 GenAI / RAG Role
+              </button>
+              <button
+                onClick={() => handleAnalyzeRoleFit("Looking for an MLOps & Cloud Engineer with experience in Docker, AWS (EC2, ECR), MLflow experiment tracking, DVC data versioning, and GitHub Actions CI/CD pipelines.")}
+                className="px-3 py-1.5 rounded-lg bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-200 border border-indigo-500/40 text-xs font-semibold"
+              >
+                ⚡ Cloud MLOps Role
+              </button>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div className="lg:col-span-6 rounded-2xl bg-[#070B14]/90 border border-slate-800 p-5 flex flex-col justify-between h-[440px]">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div className="flex items-center gap-2">
-                  <Bot className="w-5 h-5 text-cyan-400" />
-                  <span className="font-bold text-white text-sm">Ask Yoosuf's AI Copilot</span>
+          <div className="space-y-4">
+            <textarea
+              rows={3}
+              value={jobDescriptionInput}
+              onChange={(e) => setJobDescriptionInput(e.target.value)}
+              placeholder="Paste job description or requirements here..."
+              className="w-full p-4 rounded-xl bg-slate-950/80 border border-slate-800 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500"
+            />
+            <button
+              onClick={() => handleAnalyzeRoleFit()}
+              disabled={isRoleMatchLoading || !jobDescriptionInput.trim()}
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-semibold text-xs disabled:opacity-50 shadow-lg shadow-cyan-500/20"
+            >
+              {isRoleMatchLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Analyzing Match...</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 text-cyan-200" />
+                  <span>Run AI Role-Fit Analysis</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          {roleMatchResult && (
+            <div className="p-6 rounded-xl bg-slate-950/90 border border-cyan-500/40 space-y-5 animate-fade-in">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                <div>
+                  <span className="text-xs font-mono text-cyan-400 uppercase">Target Role Analysis</span>
+                  <h3 className="text-xl font-bold text-white">{roleMatchResult.roleTitle}</h3>
                 </div>
-                <span className="text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Online</span>
-              </div>
-
-              <div className="flex-1 overflow-y-auto space-y-3 py-4 pr-1">
-                {chatMessages.map((msg, idx) => (
-                  <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-xs sm:text-sm leading-relaxed ${
-                      msg.role === 'user' ? 'bg-cyan-600 text-white rounded-br-none' : 'bg-slate-900 border border-slate-800 text-slate-200 rounded-bl-none'
-                    }`}>
-                      {msg.text}
-                    </div>
-                  </div>
-                ))}
-                {isChatLoading && (
-                  <div className="flex justify-start">
-                    <div className="bg-slate-900 border border-slate-800 rounded-2xl px-4 py-2.5 text-xs text-cyan-300 flex items-center gap-2">
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      <span>Copilot is thinking...</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-2 pt-2 border-t border-slate-800">
-                <div className="flex flex-wrap gap-1.5">
-                  {[
-                    "Tell me about his RAG startup",
-                    "What MLOps tools does he use?",
-                    "Summarize his Kubernetes agent"
-                  ].map((preset, i) => (
-                    <button
-                      key={i}
-                      onClick={() => handleSendCopilotQuery(preset)}
-                      className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-[11px] text-cyan-300 border border-slate-800"
-                    >
-                      {preset}
-                    </button>
-                  ))}
+                <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-cyan-500/10 border border-cyan-500/30">
+                  <span className="text-xs text-slate-300 font-mono">Match Score:</span>
+                  <span className="text-2xl font-black text-cyan-400">{roleMatchResult.matchScore}%</span>
                 </div>
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleSendCopilotQuery();
-                  }}
-                  className="flex items-center gap-2 pt-1"
-                >
-                  <input
-                    type="text"
-                    value={chatInput}
-                    onChange={(e) => setChatInput(e.target.value)}
-                    placeholder="Ask about Yoosuf's skills or projects..."
-                    className="flex-1 px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
-                  />
-                  <button type="submit" disabled={isChatLoading} className="p-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold transition-all disabled:opacity-50">
-                    <Send className="w-4 h-4" />
-                  </button>
-                </form>
               </div>
-            </div>
-
-            <div className="lg:col-span-6 rounded-2xl bg-[#070B14]/90 border border-slate-800 p-5 flex flex-col justify-between h-[440px]">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div className="flex items-center gap-2">
-                  <Briefcase className="w-5 h-5 text-indigo-400" />
-                  <span className="font-bold text-white text-sm">AI Job Description Matcher</span>
-                </div>
-                <span className="text-[11px] font-mono text-indigo-300">Instant Evaluator</span>
-              </div>
-
-              <div className="flex-1 overflow-y-auto space-y-3 py-3 pr-1">
-                {!roleMatchResult ? (
-                  <div className="space-y-3">
-                    <p className="text-xs text-slate-300">
-                      Select a role preset or paste any job description below to instantly generate a candidate match score and evidence breakdown:
-                    </p>
-                    <div className="grid grid-cols-1 gap-2">
-                      {[
-                        { title: 'GenAI & RAG Engineer', desc: 'Looking for Qdrant, LangChain, vector search, and LLM guardrails.' },
-                        { title: 'Cloud MLOps Engineer', desc: 'Looking for Docker, AWS EC2/ECR, MLflow, DVC, and CI/CD pipelines.' },
-                        { title: 'Junior Data Scientist', desc: 'Looking for Python, Scikit-learn, Pandas, LightGBM, and EDA.' }
-                      ].map((preset, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => handleAnalyzeRoleFit(`Hiring for ${preset.title}: ${preset.desc}`)}
-                          className="p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 text-left transition-all group"
-                        >
-                          <div className="text-xs font-bold text-white group-hover:text-cyan-300">Test Fit: {preset.title}</div>
-                          <div className="text-[11px] text-slate-400 truncate">{preset.desc}</div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-white">{roleMatchResult.roleTitle}</span>
-                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-xs font-bold border border-emerald-500/30">
-                        {roleMatchResult.matchScore}% Match
+              <p className="text-sm text-slate-200 leading-relaxed">{roleMatchResult.executivePitch}</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <div className="text-xs font-mono text-cyan-400">Matching Core Skills</div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {roleMatchResult.matchingSkills.map((s, idx) => (
+                      <span key={idx} className="px-2.5 py-1 rounded bg-slate-900 text-slate-300 text-xs font-mono border border-slate-800">
+                        ✓ {s}
                       </span>
-                    </div>
-                    <p className="text-xs text-slate-300 leading-relaxed">{roleMatchResult.executivePitch}</p>
-                    <div className="text-[11px] font-mono text-cyan-400">Relevant Evidence:</div>
-                    <div className="space-y-1.5">
-                      {roleMatchResult.relevantProjects?.map((rp, i) => (
-                        <div key={i} className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-[11px]">
-                          <span className="font-bold text-white">{rp.projectName}:</span>{' '}
-                          <span className="text-slate-300">{rp.whyItMatters}</span>
-                        </div>
-                      ))}
-                    </div>
+                    ))}
                   </div>
-                )}
-                {isRoleMatchLoading && (
-                  <div className="flex items-center justify-center py-10">
-                    <div className="flex items-center gap-2 text-xs text-indigo-300">
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Analyzing candidate match...</span>
-                    </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-xs font-mono text-indigo-400">Relevant Project Evidence</div>
+                  <div className="space-y-2">
+                    {roleMatchResult.relevantProjects.map((rp, idx) => (
+                      <div key={idx} className="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800 text-xs">
+                        <div className="font-bold text-white">{rp.projectName}</div>
+                        <div className="text-slate-300 text-[11px] mt-0.5">{rp.whyItMatters}</div>
+                      </div>
+                    ))}
                   </div>
-                )}
-              </div>
-
-              <div className="space-y-2 pt-2 border-t border-slate-800">
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={jobDescriptionInput}
-                    onChange={(e) => setJobDescriptionInput(e.target.value)}
-                    placeholder="Or paste custom Job Description here..."
-                    className="flex-1 px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
-                  />
-                  <button
-                    onClick={() => handleAnalyzeRoleFit()}
-                    disabled={isRoleMatchLoading || !jobDescriptionInput.trim()}
-                    className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition-all disabled:opacity-50"
-                  >
-                    Analyze Match
-                  </button>
                 </div>
               </div>
             </div>
-          </div>
+          )}
         </section>
 
-        {/* PROJECTS SECTION */}
+        {/* Featured Projects Showcase */}
         <section id="projects" className="space-y-8 scroll-mt-20">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
@@ -1362,11 +1072,7 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
 
                 <div className="pt-6 mt-6 border-t border-slate-800/80 flex items-center justify-between gap-2">
                   <button
-                    onClick={() => {
-                      setSelectedProject(project);
-                      setProjectAiQuestion('');
-                      setProjectAiAnswer('');
-                    }}
+                    onClick={() => setSelectedProject(project)}
                     className="inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-400 hover:text-cyan-300 transition-colors"
                   >
                     <Eye className="w-4 h-4" />
@@ -1384,7 +1090,7 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
           </div>
         </section>
 
-        {/* ARCHITECTURE SECTION */}
+        {/* Interactive Architecture Explorer */}
         <section id="architecture" className="space-y-6 scroll-mt-20">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
@@ -1427,7 +1133,7 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
                     key={node.id}
                     onClick={() => setActiveNodeIndex(index)}
                     className={`text-left p-4 rounded-xl border transition-all relative ${
-                      isSelected ? 'bg-gradient-to-b from-cyan-500/15 to-indigo-500/10 border-cyan-400 shadow-lg shadow-cyan-500/10' : 'bg-slate-950/70 border-slate-800/90 hover:border-slate-700'
+                      isSelected ? 'bg-gradient-to-b from-cyan-500/15 to-indigo-500/10 border-cyan-400 shadow-lg' : 'bg-slate-950/70 border-slate-800/90 hover:border-slate-700'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">
@@ -1458,7 +1164,83 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
           </div>
         </section>
 
-        {/* SKILLS SECTION */}
+        {/* AI Portfolio Copilot */}
+        <section id="copilot" className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start scroll-mt-20">
+          <div className="lg:col-span-5 space-y-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-mono">
+              <Bot className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Gemini 3 Flash Agent</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white">Ask Yoosuf's AI Copilot</h2>
+            <p className="text-sm text-slate-300 leading-relaxed">Have questions about Yoosuf's architecture, ML frameworks, or startup experience? Ask his grounded AI agent instantly.</p>
+            <div className="space-y-2 pt-2">
+              {[
+                "Tell me about Yoosuf's multilingual RAG startup.",
+                "How does he handle MLOps and DVC versioning?",
+                "What is his experience with AWS and Docker?"
+              ].map((q, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleSendCopilotQuery(q)}
+                  className="w-full text-left p-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-xs text-slate-300 border border-slate-800 transition-all flex items-center justify-between"
+                >
+                  <span>{q}</span>
+                  <ChevronRight className="w-3.5 h-3.5 text-cyan-400" />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="lg:col-span-7 rounded-2xl bg-[#0B1220] border border-slate-800 p-6 flex flex-col h-[460px] shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-xs font-mono text-slate-300">Yoosuf Copilot (Grounded on CV & Projects)</span>
+              </div>
+              <span className="text-[10px] font-mono text-cyan-400">gemini-3-flash-preview</span>
+            </div>
+
+            <div className="flex-1 overflow-y-auto space-y-3 pr-2">
+              {chatMessages.map((msg, idx) => (
+                <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`max-w-[85%] p-3.5 rounded-xl text-xs leading-relaxed ${
+                    msg.role === 'user' ? 'bg-cyan-500 text-slate-950 font-medium' : 'bg-slate-900 text-slate-200 border border-slate-800'
+                  }`}>
+                    {msg.text}
+                  </div>
+                </div>
+              ))}
+              {isChatLoading && (
+                <div className="flex justify-start">
+                  <div className="p-3 rounded-xl bg-slate-900 text-slate-400 border border-slate-800 text-xs flex items-center gap-2">
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-cyan-400" />
+                    <span>Synthesizing response...</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="pt-3 mt-3 border-t border-slate-800 flex items-center gap-2">
+              <input
+                type="text"
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSendCopilotQuery()}
+                placeholder="Ask about MLOps, RAG, AWS..."
+                className="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500"
+              />
+              <button
+                onClick={() => handleSendCopilotQuery()}
+                disabled={isChatLoading || !chatInput.trim()}
+                className="px-4 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs disabled:opacity-50"
+              >
+                <Send className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* Technical Skills Matrix */}
         <section id="skills" className="space-y-8 scroll-mt-20">
           <div>
             <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-cyan-400 mb-2">
@@ -1497,7 +1279,7 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
           </div>
         </section>
 
-        {/* HIGHLIGHTS & PROYOUTH CERTIFICATE SECTION */}
+        {/* Highlights, ProYouth 2026 Bootcamp & Official Certificate Showcase */}
         <section id="highlights" className="space-y-8 scroll-mt-20">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
@@ -1515,7 +1297,7 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
                 <div
                   key={i}
                   className={`p-6 rounded-2xl border transition-all space-y-3 ${
-                    item.hasCertificate ? 'bg-gradient-to-br from-amber-500/10 via-slate-900/90 to-slate-900/90 border-amber-500/40 shadow-lg shadow-amber-500/5' : 'bg-slate-900/60 border-slate-800/90'
+                    item.hasCertificate ? 'bg-gradient-to-br from-amber-500/10 via-slate-900/90 to-slate-900/90 border-amber-500/40 shadow-lg' : 'bg-slate-900/60 border-slate-800/90'
                   }`}
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
@@ -1552,7 +1334,7 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
                   </div>
                   <label className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/30 text-[11px] font-medium cursor-pointer transition-all">
                     <Upload className="w-3.5 h-3.5" />
-                    <span>Upload Photo</span>
+                    <span>{portfolio.certificateDetails.imageUrl ? "Replace Image" : "Load Certificate"}</span>
                     <input type="file" accept="image/*" onChange={handleCertificateUpload} className="hidden" />
                   </label>
                 </div>
@@ -1560,22 +1342,27 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
                 {portfolio.certificateDetails.imageUrl ? (
                   <div onClick={() => setIsCertModalOpen(true)} className="rounded-xl overflow-hidden border border-slate-700 cursor-pointer group relative">
                     <img src={portfolio.certificateDetails.imageUrl} alt="ProYouth Certificate" className="w-full h-auto object-contain bg-white" />
+                    <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <span className="px-4 py-2 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs">Click to Enlarge</span>
+                    </div>
                   </div>
                 ) : (
-                  <div
-                    onClick={() => setIsCertModalOpen(true)}
-                    className="rounded-xl bg-gradient-to-br from-[#F8FAFC] to-[#EEF2F6] text-slate-900 p-6 border-2 border-amber-400/60 shadow-inner cursor-pointer space-y-3"
-                  >
-                    <div className="flex items-center justify-between border-b border-slate-300 pb-2">
-                      <span className="px-2 py-0.5 rounded bg-slate-900 text-white font-extrabold text-[10px]">NIA SRI LANKA</span>
-                      <span className="px-2 py-0.5 rounded bg-red-600 text-white font-bold text-[10px]">NPS SRI LANKA</span>
+                  <div onClick={() => setIsCertModalOpen(true)} className="rounded-xl bg-gradient-to-br from-[#F8FAFC] to-[#EEF2F6] text-slate-900 p-6 border-2 border-amber-400/60 shadow-inner cursor-pointer space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-300 pb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded bg-slate-900 text-white font-extrabold text-xs">NIA</span>
+                        <span className="text-[10px] font-bold uppercase text-slate-700 leading-tight">National Innovation Agency</span>
+                      </div>
+                      <div className="px-2.5 py-1 rounded bg-red-600 text-white font-bold text-[10px] uppercase">NPS SRI LANKA</div>
                     </div>
-                    <div className="text-center space-y-1.5">
-                      <p className="text-[11px] text-slate-600">This is to certify that</p>
-                      <p className="text-sm font-black text-slate-950 underline">{portfolio.certificateDetails.recipient}</p>
-                      <p className="text-xs font-bold text-slate-900">Artificial Intelligence Boot Camp</p>
-                      <p className="text-[10px] text-slate-600">9–10 September 2026 (#Proyouth 2026 Competition)</p>
+                    <div className="text-center space-y-2 py-2">
+                      <p className="text-xs text-slate-600">This is to certify that</p>
+                      <p className="text-base font-extrabold text-slate-950 border-b border-dotted border-slate-400 pb-1">{portfolio.certificateDetails.recipient}</p>
+                      <p className="text-xs text-slate-600">has successfully completed the</p>
+                      <h4 className="text-lg font-black text-slate-950">{portfolio.certificateDetails.program}</h4>
+                      <p className="text-xs font-medium text-slate-700">held on {portfolio.certificateDetails.dates}</p>
                     </div>
+                    <p className="text-[11px] italic text-slate-700 text-center">Organized by National Innovation Agency Sri Lanka & National Productivity Secretariat for the #Proyouth 2026 Competition.</p>
                   </div>
                 )}
               </div>
@@ -1583,14 +1370,14 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
           </div>
         </section>
 
-        {/* REFERENCES SECTION */}
+        {/* Academic References */}
         <section id="references" className="space-y-8 scroll-mt-20">
           <div>
             <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-cyan-400 mb-2">
               <UserCheck className="w-4 h-4" />
-              <span>Academic References & Direct Contact</span>
+              <span>Academic References</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-white">Academic References (Lincoln Institute of Graduate Studies)</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white">Lincoln Institute of Graduate Studies References</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1613,133 +1400,107 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
           </div>
         </section>
 
-        {/* CONTACT SECTION */}
-        <section id="contact" className="rounded-3xl bg-slate-900/80 border border-slate-800 p-6 sm:p-10 space-y-8 shadow-2xl scroll-mt-20">
+        {/* Contact & Direct Message Section */}
+        <section id="contact" className="rounded-2xl bg-slate-900/80 border border-slate-800 p-6 sm:p-10 space-y-8 shadow-2xl scroll-mt-20">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-cyan-400 mb-2">
               <Mail className="w-4 h-4" />
-              <span>Get In Touch</span>
+              <span>Get in Touch</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-white">Let's Connect & Build AI Systems Together</h2>
-            <p className="text-sm text-slate-300 mt-2">
-              Reach out for AI/ML engineering roles, RAG consulting, MLOps collaborations, or startup discussions.
-            </p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white">Let's Build Something Exceptional Together</h2>
+            <p className="text-sm text-slate-300 mt-2">Whether you are hiring for AI/ML engineering, MLOps, or want to discuss RAG architectures, feel free to send a direct message below.</p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div className="lg:col-span-5 space-y-6">
-              <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div className="lg:col-span-5 space-y-4">
+              <div className="p-5 rounded-xl bg-slate-950 border border-slate-800 space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-                    <Mail className="w-5 h-5" />
-                  </div>
+                  <div className="p-2.5 rounded-lg bg-cyan-500/10 text-cyan-400"><Mail className="w-5 h-5" /></div>
                   <div>
-                    <div className="text-xs font-mono text-slate-400">Direct Email</div>
+                    <div className="text-xs text-slate-400">Direct Email</div>
                     <div className="text-sm font-bold text-white">{portfolio.profile.email}</div>
                   </div>
                 </div>
-
                 <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    <Phone className="w-5 h-5" />
-                  </div>
+                  <div className="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-400"><Phone className="w-5 h-5" /></div>
                   <div>
-                    <div className="text-xs font-mono text-slate-400">Phone / WhatsApp</div>
+                    <div className="text-xs text-slate-400">Phone / WhatsApp</div>
                     <div className="text-sm font-bold text-white">{portfolio.profile.phone}</div>
                   </div>
                 </div>
-
                 <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                    <MapPin className="w-5 h-5" />
-                  </div>
+                  <div className="p-2.5 rounded-lg bg-indigo-500/10 text-indigo-400"><MapPin className="w-5 h-5" /></div>
                   <div>
-                    <div className="text-xs font-mono text-slate-400">Location</div>
+                    <div className="text-xs text-slate-400">Location</div>
                     <div className="text-sm font-bold text-white">{portfolio.profile.location}</div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="lg:col-span-7 rounded-2xl bg-slate-950 border border-slate-800 p-6 space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-white">Send a Direct Message</h3>
-                <button
-                  type="button"
-                  onClick={handleDraftContactMessage}
-                  disabled={isDraftingMessage}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 text-xs font-semibold transition-all disabled:opacity-50"
-                >
-                  {isDraftingMessage ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Wand2 className="w-3.5 h-3.5" />}
-                  <span>AI Draft with Gemini</span>
-                </button>
-              </div>
-
+            <div className="lg:col-span-7">
               {messageSubmitted ? (
-                <div className="p-6 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-center space-y-2">
-                  <CheckCircle2 className="w-8 h-8 mx-auto text-emerald-400" />
-                  <div className="font-bold text-sm">Opening your email client...</div>
-                  <p className="text-xs text-slate-300">Your message has been formatted to send directly to {portfolio.profile.email}.</p>
+                <div className="p-8 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-center space-y-3">
+                  <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto" />
+                  <h3 className="text-lg font-bold text-white">Message Sent Successfully!</h3>
+                  <p className="text-xs text-slate-300">Thank you for reaching out. Yoosuf will respond to your inquiry shortly.</p>
+                  <button onClick={() => setMessageSubmitted(false)} className="px-4 py-2 rounded-lg bg-slate-800 text-xs font-semibold text-white">Send Another Message</button>
                 </div>
               ) : (
-                <form onSubmit={handleSendContactMessage} className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <label className="text-xs text-slate-400">Your Name</label>
-                      <input
-                        type="text"
-                        required
-                        value={contactForm.name}
-                        onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
-                        placeholder="Hiring Manager / Recruiter"
-                        className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-xs text-slate-400">Your Email</label>
-                      <input
-                        type="email"
-                        required
-                        value={contactForm.email}
-                        onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                        placeholder="you@company.com"
-                        className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs text-slate-400">Subject / Inquiry Type</label>
-                    <select
-                      value={contactForm.subject}
-                      onChange={(e) => setContactForm({ ...contactForm, subject: e.target.value })}
-                      className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none focus:border-cyan-500"
+                <form onSubmit={(e) => { e.preventDefault(); setMessageSubmitted(true); }} className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono text-cyan-400">Direct Inquiry Form</span>
+                    <button
+                      type="button"
+                      onClick={handleDraftContactMessage}
+                      disabled={isDraftingMessage}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 text-xs font-semibold transition-all"
                     >
-                      <option value="AI / ML Engineering Opportunity">AI / ML Engineering Opportunity</option>
-                      <option value="GenAI & RAG Collaboration">GenAI & RAG Collaboration</option>
-                      <option value="Startup / Project Discussion">Startup / Project Discussion</option>
-                      <option value="General Inquiry">General Inquiry</option>
-                    </select>
+                      {isDraftingMessage ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Wand2 className="w-3.5 h-3.5" />}
+                      <span>✨ Auto-Draft with Gemini</span>
+                    </button>
                   </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs text-slate-400">Message</label>
-                    <textarea
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <input
+                      type="text"
                       required
-                      rows={4}
-                      value={contactForm.message}
-                      onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                      placeholder="Hi Yoosuf, I'd love to discuss an AI engineering role on our team..."
-                      className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
+                      placeholder="Your Name"
+                      value={contactForm.name}
+                      onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
+                      className="px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
+                    />
+                    <input
+                      type="email"
+                      required
+                      placeholder="Your Email"
+                      value={contactForm.email}
+                      onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+                      className="px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
                     />
                   </div>
-
+                  <select
+                    value={contactForm.subject}
+                    onChange={(e) => setContactForm({ ...contactForm, subject: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:outline-none focus:border-cyan-500"
+                  >
+                    <option value="AI / ML Engineering Opportunity">AI / ML Engineering Opportunity</option>
+                    <option value="GenAI & RAG Collaboration">GenAI & RAG Collaboration</option>
+                    <option value="Cloud MLOps & DevOps Role">Cloud MLOps & DevOps Role</option>
+                    <option value="General Professional Inquiry">General Professional Inquiry</option>
+                  </select>
+                  <textarea
+                    rows={4}
+                    required
+                    placeholder="Your message..."
+                    value={contactForm.message}
+                    onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
+                  />
                   <button
                     type="submit"
-                    className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-bold text-xs transition-all shadow-lg shadow-cyan-500/20 inline-flex items-center justify-center gap-2"
+                    className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-slate-950 font-bold text-sm shadow-lg transition-all"
                   >
-                    <Send className="w-4 h-4" />
-                    <span>Send Message to Yoosuf</span>
+                    Send Direct Message 🚀
                   </button>
                 </form>
               )}
@@ -1748,7 +1509,7 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
         </section>
       </main>
 
-      {/* PROJECT MODAL WITH AI DEEP-DIVE */}
+      {/* Project Inspector & AI Q&A Modal */}
       {selectedProject && (
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
           <div className="bg-[#0B1220] border border-slate-700 rounded-2xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -1757,7 +1518,7 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
                 <span className="text-xs font-mono text-cyan-400 uppercase">{selectedProject.category} • {selectedProject.status}</span>
                 <h3 className="text-2xl font-bold text-white mt-1">{selectedProject.title}</h3>
               </div>
-              <button onClick={() => setSelectedProject(null)} className="p-2 rounded-lg bg-slate-800 text-slate-400 hover:text-white">
+              <button onClick={() => { setSelectedProject(null); setProjectAiAnswer(''); setProjectAiQuestion(''); }} className="p-2 rounded-lg bg-slate-800 text-slate-400 hover:text-white">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1779,41 +1540,55 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
               </ul>
             </div>
 
-            {/* Ask AI about this project */}
-            <div className="p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/30 space-y-3">
-              <div className="flex items-center gap-2 text-cyan-300 text-xs font-bold font-mono">
-                <Sparkles className="w-4 h-4 text-cyan-400" />
-                <span>Ask Gemini AI About This Project</span>
+            {/* AI Q&A for this project */}
+            <div className="p-4 rounded-xl bg-slate-950 border border-cyan-500/30 space-y-3">
+              <div className="text-xs font-mono text-cyan-300 flex items-center gap-1.5">
+                <Bot className="w-4 h-4 text-cyan-400" />
+                <span>Ask Gemini AI about this project's architecture</span>
               </div>
               <div className="flex gap-2">
                 <input
                   type="text"
                   value={projectAiQuestion}
                   onChange={(e) => setProjectAiQuestion(e.target.value)}
-                  placeholder="e.g. How were hallucinations minimized in this RAG?"
-                  className="flex-1 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs text-white placeholder-slate-500"
+                  placeholder="e.g. How were embedding dimensions optimized?"
+                  className="flex-1 px-3 py-2 rounded-lg bg-slate-900 border border-slate-800 text-xs text-white placeholder-slate-500"
                 />
                 <button
                   onClick={() => handleAskProjectAI(selectedProject)}
                   disabled={isProjectAiLoading || !projectAiQuestion.trim()}
-                  className="px-3 py-1.5 rounded-lg bg-cyan-500 text-slate-950 font-bold text-xs disabled:opacity-50"
+                  className="px-4 py-2 rounded-lg bg-cyan-500 text-slate-950 font-bold text-xs disabled:opacity-50"
                 >
-                  {isProjectAiLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Ask AI'}
+                  {isProjectAiLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Ask"}
                 </button>
               </div>
               {projectAiAnswer && (
-                <div className="p-3 rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-200 leading-relaxed">
+                <div className="p-3 rounded-lg bg-slate-900 text-xs text-slate-200 border border-slate-800">
                   {projectAiAnswer}
                 </div>
               )}
             </div>
 
+            <div className="flex flex-wrap gap-2 pt-2">
+              {selectedProject.tech.map((t, idx) => (
+                <span key={idx} className="px-3 py-1 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono text-cyan-300">{t}</span>
+              ))}
+            </div>
+
             <div className="pt-4 border-t border-slate-800 flex justify-end gap-3">
-              <a href={selectedProject.githubUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold text-xs">
+              <a
+                href={selectedProject.githubUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold text-xs"
+              >
                 <Github className="w-4 h-4" />
                 <span>View on GitHub</span>
               </a>
-              <button onClick={() => setSelectedProject(null)} className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold">
+              <button
+                onClick={() => { setSelectedProject(null); setProjectAiAnswer(''); setProjectAiQuestion(''); }}
+                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold"
+              >
                 Close
               </button>
             </div>
@@ -1821,7 +1596,7 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
         </div>
       )}
 
-      {/* CERTIFICATE MODAL */}
+      {/* ProYouth Certificate Modal */}
       {isCertModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
           <div className="bg-[#0B1220] border border-amber-500/40 rounded-2xl max-w-3xl w-full p-6 sm:p-8 space-y-6 shadow-2xl max-h-[92vh] overflow-y-auto">
@@ -1856,6 +1631,16 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
                     Organized by the National Innovation Agency Sri Lanka in collaboration with National Productivity Secretariat, as an element of the #Proyouth 2026 Competition.
                   </p>
                 </div>
+                <div className="flex items-center justify-between border-t pt-4 text-xs text-slate-700">
+                  <div>
+                    <div className="font-bold text-slate-950">Mr W.M.D. Suranga Gunarathna</div>
+                    <div>Director General, National Productivity Secretariat</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-slate-950">Dr Muditha D. Senarath Yapa</div>
+                    <div>Chief Innovation Officer, National Innovation Agency</div>
+                  </div>
+                </div>
               </div>
             )}
 
@@ -1873,142 +1658,53 @@ ${portfolio.highlights.map((h) => `- [${h.year}] ${h.title} (${h.org}): ${h.desc
         </div>
       )}
 
-      {/* LINKEDIN GUIDE & STANDALONE DOWNLOAD MODAL */}
+      {/* LinkedIn Integration & Download HTML Modal */}
       {isLinkedinGuideOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
           <div className="bg-[#0B1220] border border-sky-500/40 rounded-2xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h3 className="text-xl font-bold text-white">How to Link This Portfolio on LinkedIn</h3>
-                <p className="text-xs text-slate-400 mt-1">Publish your portfolio to GitHub Pages (`https://yoosuf520.github.io`) in 1 click.</p>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <Linkedin className="w-6 h-6 text-sky-400" />
+                <h3 className="text-xl font-bold text-white">Link Portfolio to LinkedIn</h3>
               </div>
               <button onClick={() => setIsLinkedinGuideOpen(false)} className="p-2 rounded-lg bg-slate-800 text-slate-400 hover:text-white">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="p-4 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div>
-                <div className="text-sm font-bold text-white">1. Download Complete `index.html`</div>
-                <div className="text-xs text-slate-300 mt-0.5">Includes your full standalone interactive portfolio app.</div>
-              </div>
-              <button
-                onClick={handleDownloadStandaloneHTML}
-                className="px-4 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs inline-flex items-center gap-2 shrink-0 shadow-lg shadow-cyan-500/20"
-              >
-                <Download className="w-4 h-4" />
-                <span>Download Full index.html</span>
-              </button>
-            </div>
-
-            <div className="space-y-3 text-xs text-slate-300">
-              <div className="font-bold text-white text-sm">2. Upload to GitHub Pages (`Yoosuf520.github.io`)</div>
-              <ol className="list-decimal list-inside space-y-2 pl-1">
-                <li>Go to <a href="https://github.com/new" target="_blank" rel="noreferrer" className="text-cyan-400 underline">github.com/new</a>.</li>
-                <li>Name the repository exactly <code className="text-cyan-300 bg-slate-900 px-1.5 py-0.5 rounded">Yoosuf520.github.io</code> and make it <b>Public</b>.</li>
-                <li>Upload the downloaded <code className="text-cyan-300 bg-slate-900 px-1.5 py-0.5 rounded">index.html</code> file to the root and click <b>Commit changes</b>.</li>
-                <li>Your live site will be instantly available at <a href="https://yoosuf520.github.io" target="_blank" rel="noreferrer" className="text-cyan-400 underline">https://yoosuf520.github.io</a>!</li>
-              </ol>
-            </div>
-
-            <div className="space-y-2 text-xs text-slate-300 pt-2 border-t border-slate-800">
-              <div className="font-bold text-white text-sm">3. Add to Your LinkedIn Profile</div>
-              <p>Go to your LinkedIn profile, click <b>Edit contact info</b>, add <code className="text-cyan-300 bg-slate-900 px-1.5 py-0.5 rounded">https://yoosuf520.github.io</code> as your website URL, and set the type to <b>Portfolio</b>!</p>
-            </div>
-
-            <div className="flex justify-end pt-2">
-              <button onClick={() => setIsLinkedinGuideOpen(false)} className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold">
-                Got it
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* CUSTOMIZE MODAL */}
-      {isEditModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#0B1220] border border-slate-700 rounded-2xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xl font-bold text-white">Customize Portfolio & Add Projects</h3>
-              <button onClick={() => setIsEditModalOpen(false)} className="p-2 rounded-lg bg-slate-800 text-slate-400 hover:text-white">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-xl bg-slate-900 border border-slate-800">
-              <div className="space-y-2">
-                <div className="text-xs font-bold text-cyan-300">1. Profile Photo</div>
-                <label className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-200 border border-cyan-500/40 text-xs font-semibold cursor-pointer">
-                  <Camera className="w-4 h-4" />
-                  <span>Select Suit Photo</span>
-                  <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
-                </label>
-              </div>
-
-              <div className="space-y-2">
-                <div className="text-xs font-bold text-amber-300">2. ProYouth Certificate Photo</div>
-                <label className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/40 text-xs font-semibold cursor-pointer">
-                  <FileBadge className="w-4 h-4" />
-                  <span>Select Certificate Photo</span>
-                  <input type="file" accept="image/*" onChange={handleCertificateUpload} className="hidden" />
-                </label>
-              </div>
-            </div>
-
-            <form onSubmit={handleAddProject} className="space-y-4">
-              <div className="text-xs font-mono uppercase text-cyan-400">Add Another Project</div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <input
-                  type="text"
-                  placeholder="Project Title"
-                  value={newProject.title}
-                  onChange={(e) => setNewProject({ ...newProject, title: e.target.value })}
-                  className="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white"
-                  required
-                />
-                <select
-                  value={newProject.category}
-                  onChange={(e) => setNewProject({ ...newProject, category: e.target.value })}
-                  className="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white"
-                >
-                  <option value="GenAI & RAG">GenAI & RAG</option>
-                  <option value="MLOps & Cloud">MLOps & Cloud</option>
-                  <option value="Data Science & ML">Data Science & ML</option>
-                </select>
-              </div>
-              <input
-                type="text"
-                placeholder="Tech Stack (comma-separated, e.g. Python, FastAPI, Qdrant)"
-                value={newProject.tech}
-                onChange={(e) => setNewProject({ ...newProject, tech: e.target.value })}
-                className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white"
-              />
-              <textarea
-                placeholder="Project Summary"
-                value={newProject.summary}
-                onChange={(e) => setNewProject({ ...newProject, summary: e.target.value })}
-                rows={2}
-                className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white"
-              />
-              <div className="flex items-center justify-between pt-2">
+            <div className="space-y-4 text-sm text-slate-300">
+              <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                <div className="font-bold text-white text-base">Step 1: Download Ready-to-Host index.html</div>
+                <p className="text-xs text-slate-400">Download your standalone portfolio webpage file.</p>
                 <button
-                  type="button"
-                  onClick={handleExportJSON}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium"
+                  onClick={handleDownloadStandaloneHTML}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs shadow-md"
                 >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Export JSON</span>
-                </button>
-                <button
-                  type="submit"
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Add Project</span>
+                  <Download className="w-4 h-4" />
+                  <span>Download index.html</span>
                 </button>
               </div>
-            </form>
+
+              <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                <div className="font-bold text-white text-base">Step 2: Upload to GitHub Pages (<span className="text-cyan-400 font-mono">yoosuf520.github.io</span>)</div>
+                <ol className="list-decimal list-inside space-y-1 text-xs text-slate-300">
+                  <li>Create a new public repository on GitHub named exactly <code className="text-cyan-300 font-mono">Yoosuf520.github.io</code></li>
+                  <li>Upload your downloaded <code className="text-cyan-300 font-mono">index.html</code> file to the root folder.</li>
+                  <li>Your live site will be instantly available at <code className="text-cyan-300 font-mono">https://yoosuf520.github.io</code></li>
+                </ol>
+              </div>
+
+              <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                <div className="font-bold text-white text-base">Step 3: Add to Your LinkedIn Contact Info</div>
+                <p className="text-xs text-slate-300">Go to your LinkedIn profile (<code className="text-sky-300 font-mono">linkedin.com/in/yoosufahamed520</code>) → Edit Contact Info → Add Website → Paste <code className="text-sky-300 font-mono">https://yoosuf520.github.io</code> and select <strong>Portfolio</strong>.</p>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-slate-800 flex justify-end">
+              <button onClick={() => setIsLinkedinGuideOpen(false)} className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold">
+                Got It
+              </button>
+            </div>
           </div>
         </div>
       )}
